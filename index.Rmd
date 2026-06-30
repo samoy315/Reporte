@@ -7,6 +7,7 @@ date: "2026-06-30"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(terra, ggplot2, sf)
 ```
 
 ### Introduccion
@@ -15,6 +16,11 @@ A continuacion se mostrara el avance obtenido hasta la fecha en el desarrolllo d
 
 ```{r cars}
 summary(cars)
+```
+
+```{r}
+variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
+plot(variables)
 ```
 
 ### Avances
