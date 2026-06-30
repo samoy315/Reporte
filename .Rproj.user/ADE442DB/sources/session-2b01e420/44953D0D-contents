@@ -1,0 +1,39 @@
+---
+title: 'Reporte Subproducto 2'
+author: 'Victor Sevilla y Oscar Silva'
+output: prettydoc::html_pretty
+date: "2026-06-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Introduccion
+
+A continuacion se mostrara el avance obtenido hasta la fecha en el desarrolllo del subproducto 2, especialmente lo pertinente a las **Regiones de exposiciones** para los 10 cultivos considerados en el proyecto.
+
+```{r cars}
+summary(cars)
+```
+
+### Avances
+
+Cultivos:
+
+1.  Arroz.
+2.  Cacao.
+3.  Cafe.
+4.  Caña de azucar.
+5.  Frijol.
+6.  Maiz.
+7.  Naranja.
+8.  Papa.
+9.  Platano.
+10. Yuca.
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
