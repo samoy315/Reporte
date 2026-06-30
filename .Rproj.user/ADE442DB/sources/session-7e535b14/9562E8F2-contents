@@ -10,18 +10,64 @@ knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(terra, ggplot2, sf)
 ```
 
-### Introduccion
+## Introduccion
 
 A continuacion se mostrara el avance obtenido hasta la fecha en el desarrolllo del subproducto 2, especialmente lo pertinente a las **Regiones de exposiciones** para los 10 cultivos considerados en el proyecto.
 
-```{r cars}
-summary(cars)
-```
+## Procedimiento
 
-```{r}
+pequeña explicacion de lo que se va a mostrar: cuales variables climofisiograficas ques se van a emplear para establecer las regiones de exposicion para cada cultivos, como se establecieron las regiones de exposicion, la aptutud climaticas de las tierras
+
+### Variables climofisiograficas
+
+redactar
+
+```{r, echo=FALSE}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
 plot(variables)
 ```
+
+### Regiones de exposicion
+
+redactar
+
+Arroz
+
+Cacao
+
+Cafe
+
+Caña de azucar
+
+Frijol seco
+
+Maiz
+
+Naranja (*Citrus sinensis*)
+
+Papa (*Solanum tuberosum*)
+
+Platano (*Musa balbisiana*)
+
+Yuca (*Manihot esculenta*)
+
+### Aptitud climofisiograficas de las tierras para los tres escenarios planteados:
+
+redactar
+
+#### Historico
+
+redactar
+
+#### SPSs4.5
+
+redactar
+
+#### SPSS8.5
+
+redactar
+
+#### Capas raster de Variables Climofisiograficas
 
 ### Avances
 

@@ -97,6 +97,7 @@ percentiles <- sapply(df_numerico[, columnas_raster, drop = FALSE],
 
 percentiles
 
+
 # Aplicamos los criterios de rangos entre percentiles (0.05 y 0.95) y seleccionamos las celdas que
 # lo cumplan (Criterio Estandar):
 
