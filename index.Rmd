@@ -1,7 +1,7 @@
 ---
 title: 'Reporte Subproducto 2'
 author: 'Victor Sevilla y Oscar Silva'
-output: prettydoc::html_pretty
+output: pdf_document #prettydoc::html_pretty
 date: "2026-06-30"
 ---
 
@@ -12,9 +12,21 @@ pacman::p_load(terra, ggplot2, sf)
 
 ## Introduccion
 
-A continuacion se mostrara el avance obtenido hasta la fecha en el desarrolllo del subproducto 2, especialmente lo pertinente a las **Regiones de exposiciones** para los 10 cultivos considerados en el proyecto.
+En este documento se reportan los avances obtenidos hasta el momento del **Subproducto 2**, especificamente a lo concerniente a las **Regiones de exposiciones** de los diez (10) cultivos considerados en el proyecto.
 
-## Procedimiento
+se contempla una lista de actividades realizadas:
+
+-   Recopilacion y adecuacion de informacion espacial de informacion climatica y fisiografica, como:
+
+    -   Evapotranspiracion (ETO)
+
+    -   Precipitacion (Prec)
+
+    -   Periodo de crecimiento (Pc)
+
+    -   Periodo seco
+
+## Actividades
 
 pequeña explicacion de lo que se va a mostrar: cuales variables climofisiograficas ques se van a emplear para establecer las regiones de exposicion para cada cultivos, como se establecieron las regiones de exposicion, la aptutud climaticas de las tierras
 
