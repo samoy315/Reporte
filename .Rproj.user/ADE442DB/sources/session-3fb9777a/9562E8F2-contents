@@ -8,42 +8,104 @@ date: "2026-06-30"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 pacman::p_load(terra, ggplot2, sf)
+library(kableExtra)
+library(knitr)
+
+pts_arroz_sup <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/pts_arroz.rds")
+pts_arroz_sup1 <- as.data.frame(t(as.matrix(summary(pts_arroz_sup$HA_SIEMBRA))))
+
 ```
+
+<div style="text-align: justify;">
 
 ## Introduccion
 
-Este documento reporta los avances obtenidos hasta el momento sobre el **Subproducto 2** del proyecto **xxxx.** Especificamente lo concerniente al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados en este proyecto.
+Este documento reporta los avances obtenidos en el **Subproducto dos** del proyecto **xxxx**, especialmente los concernientes al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados.
 
-El subproducto 2 contempla una serie de actividades que de manera general contemplan: activi una lista de actividades realizadas:
+El subproducto 2 contempla de manera general una serie de actividades como:
 
 -   Recopilacion y adecuacion de informacion espacial de informacion climatica y fisiografica, como:
 
-    -   Evapotranspiracion (ETO)
-
-    -   Precipitacion (Prec)
-
-    -   Periodo de crecimiento (Pc)
-
-    -   Periodo seco
+------------------------------------------------------------------------
 
 ## Actividades
 
+A continuación, se describen las actividades realizadas mostrando algunos procesos, productos (capas) y breve descripción de los mismos.
+
+-   Descarga y adecuación cartográfica de las capas de variables climáticas y fisiográficas.
+
+-   Carga de capas de puntos representativos de los productores agrícolas pertinentes a cada uno del cultivo analizado, y su sobre posición sobre la capa del índice ETO/Precipitación.
+
+-   Extracción de los valores de cada una de las variables climofisiograficas para cada punto de los puntos de productores agrícolas.
+
+-   Calculo de los valores de percentiles 0.05 y 0.95 de cada variable climofisiografica para la ubicación de productores pertinentes a cada cultivo.
+
+-   Selección de las celdas de cada variable climofisiografica que cumpla el criterio de encontrarse entre los percentiles indicados.
+
+-   Análisis celda a celda para compilar cuales celdas cumplan el criterio anterior y así forme parte de la Región de exposición de cada cultivo analizado en este proyecto.
+
+-   Revisión bibliográfica establecer cuales cumplan
+
 pequeña explicacion de lo que se va a mostrar: cuales variables climofisiograficas ques se van a emplear para establecer las regiones de exposicion para cada cultivos, como se establecieron las regiones de exposicion, la aptutud climaticas de las tierras
+
+------------------------------------------------------------------------
 
 ### Variables climofisiograficas
 
-redactar
+Las variables climofisiograficas consideradas para el analisis segun los criterios del Plan de trabajo de UGP-PNA son:
 
-```{r, echo=FALSE}
+-   Indice ET)/Preciptacion media anual.
+
+-   Periodo de crecimiento (dias)
+
+-   Periodo seco (dias)
+
+-   Periodo humedo (dias)
+
+-   Pendiente del terreno (%)
+
+-   Altura del terreno (msnmm)
+
+</div>
+
+```{r, echo=FALSE, fig.align='center'}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
+names(variables)<- c("ETO/Precipitacion", "Periodo de crecimiento", "Periodo seco", "Periodo humedo", "Pendiente", "Altura" )
 plot(variables)
 ```
 
+<p style="text-align: center;">
+
+*Figura 1. Variables climofisiogrficas*
+
+</p>
+
+------------------------------------------------------------------------
+
+## Resultados
+
 ### Regiones de exposicion
 
-redactar
+Cada region de exposition se establecio para cada cultivo considerado en este proyecto, segun los criterios preestablecidos por la UGP-PNA y a continuaicon se describe brevemente la informacion y productos obtenidos para cada uno de ellos.
 
-Arroz
+#### Arroz
+
+**Superficie de cultivos en el pais**
+
+Segun los resultados del Censo agricola del 2008 los arrozales en venezuela se caraterizan climofisiograficamente como se muestra en la tabla 1.
+
+y la mayoria de ellos se poseen valores entre los percentiles 0.05 y 0.95 como se muestra en la tabla 2.
+
+```{r, echo=FALSE}
+pts_arroz_sup1 %>%
+  knitr::kable(caption = "Estadisticas sobre la superficie (ha) de cultivo del arroz en el pais", digits = 1) %>%
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE)
+```
+
+**Caracteristicas climofisiograficas**
+
+en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de  xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
+
 
 Cacao
 

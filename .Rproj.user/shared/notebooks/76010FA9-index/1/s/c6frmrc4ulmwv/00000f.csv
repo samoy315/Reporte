@@ -1,0 +1,2 @@
+"0","tabla_resumen <- as.data.frame(t(as.matrix(summary(women$height))))"
+"0","print(tabla_resumen)                               "

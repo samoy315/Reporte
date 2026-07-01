@@ -1,2 +1,4 @@
 "0","knitr::opts_chunk$set(echo = TRUE)"
 "0","pacman::p_load(terra, ggplot2, sf)"
+"0","library(kableExtra)"
+"0","library(knitr)"

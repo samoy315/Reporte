@@ -1,0 +1,4 @@
+"0","variables <- readRDS(""C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds"")  "
+"0","names(variables)<- c(""ETO/Precipitacion"", ""Periodo de crecimiento"", ""Periodo seco"", ""Periodo humedo"", ""Pendiente"", ""Altura"" )"
+"0",""
+"0","plot(variables)"
