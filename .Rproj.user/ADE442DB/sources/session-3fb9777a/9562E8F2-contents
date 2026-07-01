@@ -12,9 +12,9 @@ pacman::p_load(terra, ggplot2, sf)
 
 ## Introduccion
 
-En este documento se reportan los avances obtenidos hasta el momento del **Subproducto 2**, especificamente a lo concerniente a las **Regiones de exposiciones** de los diez (10) cultivos considerados en el proyecto.
+Este documento reporta los avances obtenidos hasta el momento sobre el **Subproducto 2** del proyecto **xxxx.** Especificamente lo concerniente al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados en este proyecto.
 
-se contempla una lista de actividades realizadas:
+El subproducto 2 contempla una serie de actividades que de manera general contemplan: activi una lista de actividades realizadas:
 
 -   Recopilacion y adecuacion de informacion espacial de informacion climatica y fisiografica, como:
 
