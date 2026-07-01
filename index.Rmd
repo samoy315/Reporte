@@ -1,7 +1,7 @@
 ---
 title: 'Reporte Subproducto 2'
 author: 'Victor Sevilla y Oscar Silva'
-output: pdf_document #prettydoc::html_pretty
+output: prettydoc::html_pretty
 date: "2026-06-30"
 ---
 
