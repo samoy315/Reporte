@@ -3,7 +3,7 @@
     "path": "C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/Reg_exposicion_arroz.R",
     "project_path": null,
     "type": "r_source",
-    "hash": "665358817",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1782917271900.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "38,0",
-        "scrollLine": "15"
+        "cursorPosition": "158,45",
+        "scrollLine": "144"
     },
     "folds": "",
-    "lastKnownWriteTime": 1782921934,
+    "lastKnownWriteTime": 1783007087,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1782921934110,
+    "last_content_update": 1783007087514,
     "read_only": false,
     "read_only_alternatives": []
 }

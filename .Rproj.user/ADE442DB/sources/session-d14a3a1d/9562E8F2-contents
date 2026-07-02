@@ -14,6 +14,9 @@ library(knitr)
 pts_arroz_sup <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/pts_arroz.rds")
 pts_arroz_sup1 <- as.data.frame(t(as.matrix(summary(pts_arroz_sup$HA_SIEMBRA))))
 
+arroz_percentil<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_percentil.rds")
+
+aarroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
 ```
 
 <div style="text-align: justify;">
@@ -105,6 +108,20 @@ pts_arroz_sup1 %>%
 **Caracteristicas climofisiograficas**
 
 en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de  xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
+
+
+
+```{r}
+plot(arroz_region,  
+     main = "Region de exposicion para arroz segun criterios estandar",
+     col = "darkgreen")
+
+plot(st_geometry(venezuela), 
+     add = TRUE, 
+     border = "black",   # Color de la línea del límite
+     lwd = 1.5)          # Grosor de la línea
+```
+
 
 
 Cacao

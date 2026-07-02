@@ -48,12 +48,8 @@ points(pts_arroz,
        cex = 1.2, 
        lwd = 0.5) # Grosor de las líneas de la cruz
 
-alirio <- summary(pts_arroz$HA_SIEMBRA)
-
-
 hist(pts_arroz$HA_SIEMBRA, breaks=200, xlim= c(0,1000), prob= TRUE )
 lines(density(pts_arroz$HA_SIEMBRA), col = "blue", lwd= 2)
-
 
 mi_hist <- hist(pts_arroz$HA_SIEMBRA,
                 col= "lightblue",
@@ -64,9 +60,7 @@ mi_hist <- hist(pts_arroz$HA_SIEMBRA,
                 #ylim = c(0, max(mi_hist$counts) * 1.15), # Da un 15% mas de espacio arriba
                 xlim = c(0, 380),
                 breaks = 100)
-                
-                
-                
+
 text(x = mi_hist$mids,
      y = mi_hist$counts,
      labels = mi_hist$counts,
@@ -123,6 +117,7 @@ percentiles <- sapply(df_numerico[, columnas_raster, drop = FALSE],
        na.rm = TRUE)
 
 percentiles
+saveRDS(percentiles, file="arroz_percentil.rds")
 
 # Aplicamos los criterios de rangos entre percentiles (0.05 y 0.95) y seleccionamos las celdas que
 # lo cumplan (Criterio Estandar):
@@ -162,6 +157,8 @@ plot(st_geometry(venezuela),
      add = TRUE, 
      border = "black",   # Color de la línea del límite
      lwd = 1.5)          # Grosor de la línea
+
+saveRDS(variables1c, file="arroz_region.rds")
 
 writeRaster(variables1c, "reg_arroz_estandar.tif", 
             gdal = c("COMPRESS=LZW", "TFW=YES"), 
@@ -208,5 +205,7 @@ writeRaster(variables2b, "reg_arroz_modificado.tif",
 
 # Grabamos el espacio de trabajo:
 save.image("Reg_arroz.RData")
+load("Reg_arroz.RData")
+
 
 #-------FIN----------
