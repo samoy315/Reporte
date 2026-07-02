@@ -32,7 +32,7 @@ variables <- c(eto_p_h_anual, pc_h_anual, ps_h_anual, ph_h_anual, pend1, altura1
 plot(variables)
 
 # Cargamos capas vectoraielas de perimetro pais y puntos de cultivo del censo:
-venezuela <- st_read("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/Contorno_Venezuela/AOI.shp")
+venezuela <- st_read("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/Contorno_Venezuela/AOI_linea_referencia1.shp")
 pts_arroz <- st_read("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/Censo2008/arroz/Arroz_Censo_2008.shp")
 saveRDS(pts_arroz, file= "pts_arroz.rds")
 saveRDS(venezuela, file="venezuela.rds")
