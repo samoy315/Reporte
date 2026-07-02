@@ -1,5 +1,0 @@
-"0",""
-"0","plot(st_geometry(venezuela), "
-"0","     add = TRUE, "
-"0","     border = ""black"",   # Color de la línea del límite"
-"0","     lwd = 1.5)          # Grosor de la línea"

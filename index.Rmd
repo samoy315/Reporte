@@ -22,7 +22,6 @@ venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/are
 
 ```
 
-
 ## Introduccion
 
 Este documento reporta los avances obtenidos en el **Subproducto dos** del proyecto **xxxx**, especialmente los concernientes al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados.
@@ -33,7 +32,9 @@ El subproducto 2 contempla de manera general una serie de actividades como:
 
 ------------------------------------------------------------------------
 
-## Actividades
+## Materiales y metodos
+
+### Actividades y procedimientos
 
 A continuación, se describen las actividades realizadas mostrando algunos procesos, productos (capas) y breve descripción de los mismos.
 
@@ -71,7 +72,6 @@ Las variables climofisiograficas consideradas para el analisis segun los criteri
 
 -   Altura del terreno (msnmm)
 
-
 ```{r, echo=FALSE, fig.align='center'}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
 names(variables)<- c("ETO/Precipitacion", "Periodo de crecimiento", "Periodo seco", "Periodo humedo", "Pendiente", "Altura" )
@@ -106,9 +106,21 @@ pts_arroz_sup1 %>%
   kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10)
 ```
 
-**Caracteristicas climofisiograficas**
+**Caracterizacion climofisiografica de la region arroceras**
 
-en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
+en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura
+
+```{r, echo=FALSE}
+arroz_percentil %>% 
+  knitr::kable(caption = "Percentiles (5% y 95%) para las variables del cultivo de arroz",
+               digits = 2) %>% 
+  kableExtra::kable_styling(bootstrap_options = "striped", 
+                            full_width = FALSE, 
+                            font_size = 10)
+
+```
+
+**Region de exposion arroceras**
 
 ```{r, echo=FALSE, fig.align='center'}
 plot(arroz_region,  
