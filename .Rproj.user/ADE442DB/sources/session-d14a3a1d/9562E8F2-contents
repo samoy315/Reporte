@@ -22,7 +22,7 @@ venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/are
 
 ```
 
-::: {style="text-align: justify;"}
+
 ## Introduccion
 
 Este documento reporta los avances obtenidos en el **Subproducto dos** del proyecto **xxxx**, especialmente los concernientes al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados.
@@ -70,7 +70,7 @@ Las variables climofisiograficas consideradas para el analisis segun los criteri
 -   Pendiente del terreno (%)
 
 -   Altura del terreno (msnmm)
-:::
+
 
 ```{r, echo=FALSE, fig.align='center'}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  

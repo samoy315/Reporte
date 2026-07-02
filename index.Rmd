@@ -22,7 +22,6 @@ venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/are
 
 ```
 
-<div style="text-align: justify;">
 
 ## Introduccion
 
@@ -72,7 +71,6 @@ Las variables climofisiograficas consideradas para el analisis segun los criteri
 
 -   Altura del terreno (msnmm)
 
-</div>
 
 ```{r, echo=FALSE, fig.align='center'}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
@@ -110,9 +108,7 @@ pts_arroz_sup1 %>%
 
 **Caracteristicas climofisiograficas**
 
-en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de  xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
-
-
+en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
 
 ```{r, echo=FALSE, fig.align='center'}
 plot(arroz_region,  
@@ -124,8 +120,6 @@ plot(st_geometry(venezuela),
      border = "black",   # Color de la línea del límite
      lwd = 1.5)          # Grosor de la línea
 ```
-
-
 
 Cacao
 
