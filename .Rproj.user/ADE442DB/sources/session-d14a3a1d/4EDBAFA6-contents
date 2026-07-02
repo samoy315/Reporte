@@ -35,6 +35,7 @@ plot(variables)
 venezuela <- st_read("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/Contorno_Venezuela/AOI.shp")
 pts_arroz <- st_read("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/Censo2008/arroz/Arroz_Censo_2008.shp")
 saveRDS(pts_arroz, file= "pts_arroz.rds")
+saveRDS(venezuela, file="venezuela.rds")
 
 # Graficamos la capa de clases de suelos y los puntos de chequeos:
 plot(eto_p_h_anual,  

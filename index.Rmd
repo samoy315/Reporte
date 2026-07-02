@@ -16,7 +16,10 @@ pts_arroz_sup1 <- as.data.frame(t(as.matrix(summary(pts_arroz_sup$HA_SIEMBRA))))
 
 arroz_percentil<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_percentil.rds")
 
-aarroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
+arroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
+
+venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/venezuela.rds")
+
 ```
 
 <div style="text-align: justify;">
@@ -111,7 +114,7 @@ en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en
 
 
 
-```{r}
+```{r, echo=FALSE, fig.align='center'}
 plot(arroz_region,  
      main = "Region de exposicion para arroz segun criterios estandar",
      col = "darkgreen")

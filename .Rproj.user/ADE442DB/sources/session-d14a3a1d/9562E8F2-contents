@@ -16,11 +16,13 @@ pts_arroz_sup1 <- as.data.frame(t(as.matrix(summary(pts_arroz_sup$HA_SIEMBRA))))
 
 arroz_percentil<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_percentil.rds")
 
-aarroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
+arroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
+
+venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/venezuela.rds")
+
 ```
 
-<div style="text-align: justify;">
-
+::: {style="text-align: justify;"}
 ## Introduccion
 
 Este documento reporta los avances obtenidos en el **Subproducto dos** del proyecto **xxxx**, especialmente los concernientes al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados.
@@ -68,8 +70,7 @@ Las variables climofisiograficas consideradas para el analisis segun los criteri
 -   Pendiente del terreno (%)
 
 -   Altura del terreno (msnmm)
-
-</div>
+:::
 
 ```{r, echo=FALSE, fig.align='center'}
 variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
@@ -107,11 +108,9 @@ pts_arroz_sup1 %>%
 
 **Caracteristicas climofisiograficas**
 
-en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de  xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
+en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura de **`r max(pts_arroz_sup$HA_SIEMBRA)`**
 
-
-
-```{r}
+```{r, echo=FALSE, fig.align='center'}
 plot(arroz_region,  
      main = "Region de exposicion para arroz segun criterios estandar",
      col = "darkgreen")
@@ -121,8 +120,6 @@ plot(st_geometry(venezuela),
      border = "black",   # Color de la línea del límite
      lwd = 1.5)          # Grosor de la línea
 ```
-
-
 
 Cacao
 

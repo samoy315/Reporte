@@ -8,4 +8,7 @@
 "0",""
 "0","arroz_percentil<- readRDS(""C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_percentil.rds"")"
 "0",""
-"0","aarroz_region<- readRDS(""C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds"")"
+"0","arroz_region<- readRDS(""C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds"")"
+"0",""
+"0","venezuela<- readRDS(""C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/venezuela.rds"")"
+"0",""
