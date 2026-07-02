@@ -103,7 +103,7 @@ y la mayoria de ellos se poseen valores entre los percentiles 0.05 y 0.95 como s
 ```{r, echo=FALSE}
 pts_arroz_sup1 %>%
   knitr::kable(caption = "Estadisticas sobre la superficie (ha) de cultivo del arroz en el pais", digits = 1) %>%
-  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE)
+  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 8)
 ```
 
 **Caracteristicas climofisiograficas**
