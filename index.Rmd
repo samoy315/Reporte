@@ -1,185 +1,229 @@
 ---
-title: 'Reporte Subproducto 2'
-author: 'Victor Sevilla y Oscar Silva'
+title: 'Muestreo de Sueos Maiz-Portuguesa'
+author: 'Diego Machado, Jose Caicedo y Victor Sevilla'
 output: prettydoc::html_pretty
-date: "2026-06-30"
+date: "2026-08-10"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-pacman::p_load(terra, ggplot2, sf)
-library(kableExtra)
-library(knitr)
+# Localizacion de sitios de muestreo
 
-pts_arroz_sup <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/pts_arroz.rds")
-pts_arroz_sup1 <- as.data.frame(t(as.matrix(summary(pts_arroz_sup$HA_SIEMBRA))))
+A continuacion se exponen diferentes metodos para localizar veinte (20) sitios de observacion en campo, para que posteriormente se logre la estimacion de los rendimientos del cultivo de maiz en area bajo estudio.
 
-arroz_percentil<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_percentil.rds")
-
-arroz_region<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/arroz_region.rds")
-
-venezuela<- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/venezuela.rds")
-
+```{r, echo=FALSE, include=FALSE}
+library(sp); library(sf); library(raster); library(terra); library(leaflet); library(tidyverse); library(rmarkdown); library(sgsR); library(clhs); library(ggplot2); library(mapview)
+paleta_semaforo <- colorRampPalette(c("red", "orange", "yellow", "green3"))
 ```
 
-## Introduccion
+### Area de estudio
 
-Este documento reporta los avances obtenidos en el **Subproducto dos** del proyecto **xxxx**, especialmente los concernientes al desarrollo de las **Regiones de exposiciones** de los diez (10) cultivos considerados.
+El area de estudio se encuentra en el estado Portuguesa y posee una superficie de 94.96 ha, ademas esta dividida en 4 lotes.
 
-El subproducto 2 contempla de manera general una serie de actividades como:
-
--   Recopilacion y adecuacion de informacion espacial de informacion climatica y fisiografica, como:
-
-------------------------------------------------------------------------
-
-## Materiales y metodos
-
-### Actividades y procedimientos
-
-A continuación, se describen las actividades realizadas mostrando algunos procesos, productos (capas) y breve descripción de los mismos.
-
--   Descarga y adecuación cartográfica de las capas de variables climáticas y fisiográficas.
-
--   Carga de capas de puntos representativos de los productores agrícolas pertinentes a cada uno del cultivo analizado, y su sobre posición sobre la capa del índice ETO/Precipitación.
-
--   Extracción de los valores de cada una de las variables climofisiograficas para cada punto de los puntos de productores agrícolas.
-
--   Calculo de los valores de percentiles 0.05 y 0.95 de cada variable climofisiografica para la ubicación de productores pertinentes a cada cultivo.
-
--   Selección de las celdas de cada variable climofisiografica que cumpla el criterio de encontrarse entre los percentiles indicados.
-
--   Análisis celda a celda para compilar cuales celdas cumplan el criterio anterior y así forme parte de la Región de exposición de cada cultivo analizado en este proyecto.
-
--   Revisión bibliográfica establecer cuales cumplan
-
-pequeña explicacion de lo que se va a mostrar: cuales variables climofisiograficas ques se van a emplear para establecer las regiones de exposicion para cada cultivos, como se establecieron las regiones de exposicion, la aptutud climaticas de las tierras
-
-------------------------------------------------------------------------
-
-### Variables climofisiograficas
-
-Las variables climofisiograficas consideradas para el analisis segun los criterios del Plan de trabajo de UGP-PNA son:
-
--   Indice ET)/Preciptacion media anual.
-
--   Periodo de crecimiento (dias)
-
--   Periodo seco (dias)
-
--   Periodo humedo (dias)
-
--   Pendiente del terreno (%)
-
--   Altura del terreno (msnmm)
-
-```{r, echo=FALSE, fig.align='center'}
-variables <- readRDS("C:/Sevilla/UCV/Oscar/FAO_Cambiocliamtico2026/Coberturas/area_trabajo/vari_climofisiograficas.rds")  
-names(variables)<- c("ETO/Precipitacion", "Periodo de crecimiento", "Periodo seco", "Periodo humedo", "Pendiente", "Altura" )
-plot(variables)
+```{r, warning = FALSE, echo=FALSE}
+perimetro<- shapefile("Camburito_Acarigua1.shp")
+perimetro_sf<- st_as_sf(perimetro)
+ggplot(perimetro_sf) +
+  geom_sf(fill= "lightgreen", color="darkgreen", lwd=1) +
+  labs(title="Area de estudio",
+       x = "Longitud",
+       y = "Latitud") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_continuous(n.breaks = 4, labels = function(x) round(x, 1))
 ```
 
-<p style="text-align: center;">
+### 1.- Muestreo Aleatorio
 
-*Figura 1. Variables climofisiogrficas*
+```{r, echo=2:4}
+set.seed(0212)
+muestra_aleatoria<- spsample(perimetro, n= 20, type="random")
+plot(perimetro, main="Muestreo aleatorio", cex.main= 1)
+points(muestra_aleatoria, pch=21, col="black", bg=1:20, cex=1.2)
+cat("Coordendas de las primeras seis muestras resultantes")
+head(muestra_aleatoria@coords)
+```
 
-</p>
+### 2.- Muestreo Sistematico Regular
 
-------------------------------------------------------------------------
+```{r, echo=-1}
+set.seed(0212)
+muestra_sistematico<- spsample(perimetro, n=20, type= "regular")
+plot(perimetro, main="Muestreo sistematico regular", cex.main= 1)
+points(muestra_sistematico, pch=21, col="black", bg=1:20, cex=1.2)
+head(muestra_sistematico@coords)
+```
 
-## Resultados
+### 3.- Muestreo estratificado por lotes
 
-### Regiones de exposicion
+```{r}
+set.seed(1234)
+muestra_estratificada<- st_sample(perimetro_sf, size = c(5,5,5,5), type="random" )
+plot(st_geometry(perimetro_sf), main="Muestreo estratificado por lote")
+plot(muestra_estratificada, pch = 21, bg=1:20, cex = 1.2, add=TRUE)
+head(st_coordinates(muestra_estratificada))
+```
 
-Cada region de exposition se establecio para cada cultivo considerado en este proyecto, segun los criterios preestablecidos por la UGP-PNA y a continuaicon se describe brevemente la informacion y productos obtenidos para cada uno de ellos.
+### 4.- Muestreo no alineado
 
-#### Arroz
+Básicamente, es el punto intermedio perfecto entre el orden estricto de un muestreo del ttipo **Regular** y el **Azar** total.
 
-**Superficie de cultivos en el pais**
+```{r}
+set.seed(1234)
+muestra_nonalignedo<- spsample(perimetro, n=20, type="nonaligned")
+plot(perimetro, main="Muestreo no alineado", cex.main=1)
+points(muestra_nonalignedo, pch=21, col="black", bg=1:20, cex=1.2)
+head(muestra_nonalignedo@coords)
+```
 
-Segun los resultados del Censo agricola del 2008 los arrozales en venezuela se caraterizan climofisiograficamente como se muestra en la tabla 1.
-
-y la mayoria de ellos se poseen valores entre los percentiles 0.05 y 0.95 como se muestra en la tabla 2.
+### 5.- Muestreo hexagonal
 
 ```{r, echo=FALSE}
-pts_arroz_sup1 %>%
-  knitr::kable(caption = "Estadisticas sobre la superficie (ha) de cultivo del arroz en el pais", digits = 1) %>%
-  kableExtra::kable_styling(bootstrap_options = "striped", full_width = FALSE, font_size = 10)
+s1 <- sapply(slot(perimetro, "polygons"), function(i) spsample(i, n = 5, type = "hexagonal", offset=c(0,0)))
+
+typeof(s1)
+class(s1[[1]])
+summary(s1)
+
+s.merged<- do.call('rbind',s1)
+
+plot(perimetro, main = "Puntos de muestreo hexagonalmente en cada lote")
+points(s.merged, pch=21, col= "red",  bg = 1:20 ,cex= 1.1) 
 ```
 
-**Caracterizacion climofisiografica de la region arroceras**
+Este muestreo del tipo **Hexagonal**, posee un algoritmo que prioriza mantener la geometría perfecta por encima de la cantidad exacta de puntos.
 
-en cuanto a sus carateristicas climaticas y fisiograficas el arroz se cultiva en lugares con un indice de ETO/Preciptacion con promedio de xxx y tanto periodo de crecimeito, pseco, phumedo, pendiente de xx y altura
+### 6.- Muestreo estratificado por la altura y el NDVI
 
-```{r, echo=FALSE}
-arroz_percentil %>% 
-  knitr::kable(caption = "Percentiles (5% y 95%) para las variables del cultivo de arroz",
-               digits = 2) %>% 
-  kableExtra::kable_styling(bootstrap_options = "striped", 
-                            full_width = FALSE, 
-                            font_size = 10)
+```{r}
+set.seed(0212)
+ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
+dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
+dsm_res<- resample(dsm, ndvi, method="bilinear")
+cortes_altura<- c(0, 236.8, 1,
+                  236.8, 240.4, 2,
+                  240.4, 242.6, 3,
+                  242.6, 270, 4 )
 
+matriz_altura<- matrix(cortes_altura, ncol=3, byrow = TRUE)
+
+cortes_ndvi<- c(-1, 0.223, 1,
+                0.223, 0.349, 2,
+                0.349, 0.437, 3,
+                0.437, 10, 4)
+
+matriz_ndvi<- matrix(cortes_ndvi, ncol=3, byrow = TRUE)
+
+altura_cat<- classify(dsm_res, matriz_altura)
+ndvi_cat<- classify(ndvi, matriz_ndvi)
+mapa_estratos<- (altura_cat * 10) + ndvi_cat
+
+raster_agregado<- aggregate(mapa_estratos, fact = 10, fun = "modal")
+raster_recortado<- mask(raster_agregado, vect(perimetro))
+ 
+puntos_estratificados<- spatSample(raster_recortado, size=1, method="stratified", as.points = TRUE, na.rm=TRUE)
+
+plot(raster_recortado, main="Muestreo Estratificado Optimizado", col=paleta_semaforo(4), cex.main=1)
+plot(perimetro, add=TRUE, border="black", lwd=1.5)
+plot(puntos_estratificados, add=TRUE, pch=21, bg="blue", cex=1.2)
 ```
 
-**Region de exposion arroceras**
+### 7.- Muestreo hipercubolatino
 
-```{r, echo=FALSE, fig.align='center'}
-plot(arroz_region,  
-     main = "Region de exposicion para arroz segun criterios estandar",
-     col = "darkgreen")
+El Muestreo por **Hipercubo Latino Condicionado** (cLHS), es una técnica estadística inteligente diseñada para extraer una muestra pequeña y altamente representativa a partir de una inmensa cantidad de datos espaciales. Este tipo de muestreo evalúa todo el universo de datos y selecciona cuidadosamente un número reducido de puntos garantizando que ese pequeño grupo refleje, de manera matemáticamente exacta, toda la diversidad de condiciones que existen en el paisaje original. En resumen, funciona como un filtro que crea un "clon en miniatura" de toda tu área de estudio, asegurando que no queden por fuera ni los valores más comunes ni los extremos, lo que permite ahorrar tiempo y recursos en el trabajo de campo sin perder rigor científico.
 
-plot(st_geometry(venezuela), 
-     add = TRUE, 
-     border = "black",   # Color de la línea del límite
-     lwd = 1.5)          # Grosor de la línea
+La variables auxiliares empleadas fueron:
+
+-   Los indices
+
+    -   El NDVI.
+
+    -   El GNDVI.
+
+    -   El GCI.
+
+-   El Modelo digital de elevacion.
+
+Los cuales se aprecian en la siguiente figura.
+
+```{r echo=FALSE, warning=FALSE}
+set.seed(1234)
+ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
+gndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/GNDVI_10m_uw.TIF")
+gci<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/GCI_10m_uw.TIF")
+dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
+
+res(ndvi); res(gndvi); res(gci); res(dsm)
+ext(ndvi); ext(gndvi); ext(gci); ext(dsm)
+dsm_res<- resample(dsm, ndvi, method="bilinear")
+res(ndvi); res(gndvi); res(gci); res(dsm_res)
+
+par(mfrow=c(2,2))
+par(mar=c(1,1,1,1))
+plot(ndvi, main="NDVI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
+plot(gndvi, main="GNDVI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
+plot(gci, main="GCI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
+plot(dsm_res, main = "MDS", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
+
+r.stack<- c(ndvi, gndvi, gci, dsm_res)
+names(r.stack)<- c("ndvi,", "gndvi", "gci", "mds")
+names(r.stack)
+s<- spatSample(r.stack, size = 500, method="regular", as.points=TRUE, na.rm=TRUE)
+
+s_dentro<- s[vect(perimetro),]
+
+par(mar = c(1,1,1,1))
+plot(dsm_res, axes=FALSE)
+plot(s_dentro,add=TRUE)
+plot(perimetro, add=TRUE, border="white", lwd=2)
+
+s_sf<- st_as_sf(s_dentro)
+s.clhs <- clhs(s_sf, size = 20, progress = FALSE, iter = 1000, simple = FALSE)
+s.clhs_plot<- s.clhs
+s.clhs_plot$initial_object<- st_drop_geometry(s.clhs_plot$initial_object)
+s.clhs_plot$sampled_data<- st_drop_geometry(s.clhs_plot$sampled_data)
+plot(s.clhs_plot, mode = c("obj", "box"))
 ```
 
-Cacao
+**Grafico de la izquierda:** La línea con forma de escalera que va bajando significa que el algoritmo funcionó bien. *Caída inicial drástica.* Inició con un nivel de error cercano a 65, pero en apenas las primeras 250 iteraciones logró una caída casi vertical hasta estabilizarse en un valor muy bajo (cerca de 12 o 13).
 
-Cafe
+*Estabilización (Línea plana al final):* La extensa línea completamente horizontal desde la iteración 250 hasta la 1000 significa que el algoritmo encontró muy rápido la combinación de puntos óptima y, durante los 750 intentos restantes, comprobó que ya no existía ninguna forma matemática de mejorar esa selección.
 
-Caña de azucar
+------------------------------------------------------------------------
 
-Frijol seco
+**Grafico de la derecha:** Aquí es donde se comprueba visualmente si la muestra elegida realmente se parece al mapa original (total) para cada una de las variables auxiliares empleadas, como el NDVI, GNDV, GCI y MDS. Cada variable tiene un diagrama de cajas emparejando tanto el:
 
-Maiz
+-   init (Initial): Representa el 100% de los datos del mapa original.
 
-Naranja (*Citrus sinensis*)
+-   spl (Sampled): Representa únicamente la pequeña muestra seleccionada de 20 puntos.
 
-Papa (*Solanum tuberosum*)
+Si la línea gruesa del centro está casi al mismo nivel en ambas cajas, significa que el promedio de la muestra es idéntico al promedio del mapa.
 
-Platano (*Musa balbisiana*)
+Si la caja de la muestra (`spl`) abarca el mismo tamaño que la original (`init`), significa que el algoritmo capturó toda la variedad de terrenos (desde los más bajos hasta los más altos).
 
-Yuca (*Manihot esculenta*)
+------------------------------------------------------------------------
 
-### Aptitud climofisiograficas de las tierras para los tres escenarios planteados:
+### Resultados del muestreo por Hipercubo latino:
 
-redactar
+-   **`gci` (Índice de Clorofila Verde):** *Muy bueno*. Las dos cajas son clones casi idénticos. La línea gruesa (mediana) y los límites de la caja están al mismo nivel. La muestra representa esta variable a la perfección.
 
-#### Historico
+-   **`gndvi` (Índice de Vegetación de Diferencia Normalizada Verde):** *Muy sólido*. La estructura principal de la caja es idéntica. Solo omitió algunos puntos atípicamente bajos (los puntos negros abajo), pero el comportamiento general está perfectamente representado.
 
-redactar
+-   **`mds` (Modelo Digital de Superficie / Altura):** *Un resultado muy bueno*. Los promedios centrales (línea negra gruesa) están alineados. La muestra capturó bien tanto las zonas altas como las bajas del terreno.
 
-#### SPSs4.5
+-   **`ndvi` (Índice de Vegetación de Diferencia Normalizada):** Aquí hay una ***ligerísima diferencia***. La caja de la muestra (`spl`) está un poquito "empujada" hacia arriba en comparación con el mapa original (`init`), y la línea central también es levemente más alta. Además, a la muestra le faltan los puntos negros de abajo.
 
-redactar
+    ------------------------------------------------------------------------
 
-#### SPSS8.5
+    ***CONCLUSION, La*** **muestra capturó perfectamente la vegetación normal y densa, pero subrepresentó las zonas más desnudas o de menor vigor vegetal del terreno. No es un fallo crítico estadísticamente, pero es bueno que se tengas en cuenta al analizar los resultados agronómicos.**
 
-redactar
+```{r}
+subset.idx<- s.clhs$index_samples
 
-#### Capas raster de Variables Climofisiograficas
-
-### Avances
-
-Cultivos:
-
-1.  Arroz.
-2.  Cacao.
-3.  Cafe.
-4.  Caña de azucar.
-5.  Frijol.
-6.  Maiz.
-7.  Naranja.
-8.  Papa.
-9.  Platano.
-10. Yuca.
+par(mfrow=c(1,2))
+par(mar=c(1,1,1,1))
+cat("Muestras resultantes sobre las variables auxliares NDVI y el Modelo de altura")
+plot(dsm_res, axes=FALSE, col=paleta_semaforo(4), main="Muestras sobre el MDS", cex.main=1)
+plot(s_dentro[subset.idx,], col="black", bg="blue",add=TRUE, pch=21)
+plot(perimetro,add=TRUE, border="black",lwd=2)
+plot(ndvi, axes=FALSE, col=paleta_semaforo(4), main="Muestras sobre el NDVI", cex.main=1)
+plot(s_dentro[subset.idx,], col="black", bg="blue",add=TRUE, pch=21)
+plot(perimetro,add=TRUE, border="black",lwd=2)
+```
