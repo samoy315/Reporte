@@ -107,7 +107,7 @@ Es un método estadístico que divide una población en subgrupos distintos (est
 
 En este caso los estratos empleados son las capas de variables auxiliares como el NDVI y el Modelo Digital de Elevación (Atura).
 
-```{r, echo= -c(1:4, 6, 8:13), warning=FALSE, results='hide'}
+```{r, echo= -c(1:4, 9, 14:19,21:24), warning=FALSE, results='hide'}
 set.seed(0212)
 ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
 dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
@@ -116,25 +116,18 @@ cortes_altura<- c(0, 236.8, 1,
                   236.8, 240.4, 2,
                   240.4, 242.6, 3,
                   242.6, 270, 4 )
-
 matriz_altura<- matrix(cortes_altura, ncol=3, byrow = TRUE)
-
 cortes_ndvi<- c(-1, 0.223, 1,
                 0.223, 0.349, 2,
                 0.349, 0.437, 3,
                 0.437, 10, 4)
-
 matriz_ndvi<- matrix(cortes_ndvi, ncol=3, byrow = TRUE)
-
 altura_cat<- classify(dsm_res, matriz_altura)
 ndvi_cat<- classify(ndvi, matriz_ndvi)
 mapa_estratos<- (altura_cat * 10) + ndvi_cat
-
 raster_agregado<- aggregate(mapa_estratos, fact = 10, fun = "modal")
 raster_recortado<- mask(raster_agregado, vect(perimetro))
- 
 puntos_estratificados<- spatSample(raster_recortado, size=1, method="stratified", as.points = TRUE, na.rm=TRUE)
-
 plot(raster_recortado, main="Muestreo Estratificado Optimizado", col=paleta_semaforo(4), cex.main=1)
 plot(perimetro, add=TRUE, border="black", lwd=1.5)
 plot(puntos_estratificados, add=TRUE, pch=21, bg="blue", cex=1.2)
