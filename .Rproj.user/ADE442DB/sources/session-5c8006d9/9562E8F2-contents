@@ -90,7 +90,7 @@ El muestreo espacial hexagonal divide el área de estudio utilizando una red uni
 
 Este muestreo del tipo **Hexagonal**, posee un algoritmo que prioriza mantener la geometría perfecta por encima de la cantidad exacta de puntos.
 
-```{r, echo= -c(2,5:7)}
+```{r, echo= -c(2,5:8)}
 s1 <- sapply(slot(perimetro, "polygons"), function(i) spsample(i, n = 5, type = "hexagonal", offset=c(0,0)))
 s.merged<- do.call('rbind',s1)
 plot(perimetro, main = "Puntos de muestreo hexagonalmente en cada lote")
@@ -107,7 +107,7 @@ Es un método estadístico que divide una población en subgrupos distintos (est
 
 En este caso los estratos empleados son las capas de variables auxiliares como el NDVI y el Modelo Digital de Elevación (Atura).
 
-```{r, echo= -c(1:4, 9, 14:19,21:24), warning=FALSE, results='hide'}
+```{r, echo= -c(1:4,6,8:13,15:19), warning=FALSE, results='hide'}
 set.seed(0212)
 ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
 dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
@@ -151,37 +151,31 @@ Las variables auxiliares empleadas fueron:
 
 Los cuales se aprecian en la siguiente figura.
 
-```{r echo=FALSE, warning=FALSE}
+```{r echo= -c(1, 6:15, 17:18, 20:25, 27:30), warning=FALSE, results='hide'}
 set.seed(1234)
 ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
 gndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/GNDVI_10m_uw.TIF")
 gci<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/GCI_10m_uw.TIF")
 dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
-
 res(ndvi); res(gndvi); res(gci); res(dsm)
 ext(ndvi); ext(gndvi); ext(gci); ext(dsm)
 dsm_res<- resample(dsm, ndvi, method="bilinear")
 res(ndvi); res(gndvi); res(gci); res(dsm_res)
-
 par(mfrow=c(2,2))
 par(mar=c(1,1,1,1))
 plot(ndvi, main="NDVI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
 plot(gndvi, main="GNDVI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
 plot(gci, main="GCI", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
 plot(dsm_res, main = "MDS", cex.main = 1, cex.axis= 0.75, col=paleta_semaforo(4))
-
 r.stack<- c(ndvi, gndvi, gci, dsm_res)
 names(r.stack)<- c("ndvi,", "gndvi", "gci", "mds")
 names(r.stack)
 s<- spatSample(r.stack, size = 500, method="regular", as.points=TRUE, na.rm=TRUE)
-
 s_dentro<- s[vect(perimetro),]
-
 par(mar = c(1,1,1,1))
 plot(dsm_res, axes=FALSE)
 plot(s_dentro,add=TRUE)
 plot(perimetro, add=TRUE, border="white", lwd=2)
-
 s_sf<- st_as_sf(s_dentro)
 s.clhs <- clhs(s_sf, size = 20, progress = FALSE, iter = 1000, simple = FALSE)
 s.clhs_plot<- s.clhs
@@ -234,6 +228,8 @@ plot(perimetro,add=TRUE, border="black",lwd=2)
 plot(ndvi, axes=FALSE, col=paleta_semaforo(4), main="Muestras sobre el NDVI", cex.main=1)
 plot(s_dentro[subset.idx,], col="black", bg="blue",add=TRUE, pch=21)
 plot(perimetro,add=TRUE, border="black",lwd=2)
+cat("Coordenadas de los sitios de muestras resultantes")
+head(crds(s_dentro[subset.idx,]),20)
 ```
 
 ```{r, include=FALSE}
