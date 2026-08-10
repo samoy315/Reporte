@@ -108,7 +108,7 @@ Es un método estadístico que divide una población en subgrupos distintos (est
 
 En este caso los estratos empleados son las capas de variables auxiliares como el NDVI y el Modelo Digital de Elevacion (Atura).
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 set.seed(0212)
 ndvi<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/NDVI_10m_uw.TIF")
 dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/prueba/DSM_apilado_uw.tif")
@@ -230,7 +230,7 @@ Si la caja de la muestra (`spl`) abarca el mismo tamaño que la original (`init`
 
     ***CONCLUSION, La*** **muestra capturó perfectamente la vegetación normal y densa, pero subrepresentó las zonas más desnudas o de menor vigor vegetal del terreno. No es un fallo crítico estadísticamente, pero es bueno que se tengas en cuenta al analizar los resultados agronómicos.**
 
-```{r}
+```{r, echo=FALSE, warning=FALSE}
 subset.idx<- s.clhs$index_samples
 
 par(mfrow=c(1,2))
