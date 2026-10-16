@@ -1,5 +1,5 @@
 ---
-title: 'Muestreos de Suelos para Maíz en Portuguesa'
+title: 'Rendimiento de maiz en Portuguesa'
 author: 'Diego Machado, Jose Caicedo, Grabiel Machado y Victor Sevilla'
 date: "2026-10-10"
 output: 
@@ -41,6 +41,26 @@ h1, h2, h3, h4, h5, h6, .title {
 /* 6. Botón de menú en teléfonos móviles */
 .navbar-toggle .icon-bar { 
   background-color: #2E7D32 !important; 
+}
+
+/* 1. Forzar salto de línea y alineación en el título verde */
+#sidebar h2, #sidebar h2 a {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  text-align: left !important;
+  line-height: 1.3 !important;
+}
+
+/* 2. Forzar salto de línea en las opciones del menú inferior */
+#sidebar ul li a {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  line-height: 1.3 !important;
+  padding-right: 10px !important; /* Evita que el texto pegue justo en el borde gris */
+}
+
+body {
+  background-color: #FCFCFC !important;
 }
 </style>
 ```
@@ -281,7 +301,7 @@ head(crds(s_dentro[subset.idx,]),20)
 
 ------------------------------------------------------------------------
 
-# Estimación del Rendimiento del maíz en lotes Dugarte - Araure, empleando técnicas de GeoIA
+# Estimación del Rendimiento del maíz empleando técnicas GeoIA
 
 ### Objetivos
 
@@ -517,12 +537,17 @@ text(sitios,
 Se emplea el grafico de Taylor como una herramienta visual para evaluar matematicamente el desempeño del modelo predictivo de regresion-kriging (RLM). para lo que se toma tres estadísticas clave simultáneamente en un espacio bidimensional: el coeficiente de correlación, la desviación estándar y el error cuadrático medio centrado.
 
 
-```{r, fig.width=7, fig.height=7, warning = FALSE, echo=FALSE, message=FALSE}
+```{r, warning = FALSE, echo=FALSE, message=FALSE, fig.width=7, fig.height=6}
 library(plotrix)
 
 # Datos de ejemplo (sustituye esto por tus variables reales)
-rendimiento_real <- c(0.519, 0, 0.456, 0.501, 0.456, 0.669, 0.522, 0.465, 0.465, 0.56, 0.391, 0.29, 0.57, 0.475, 0.63, 0.312, 0.615, 0.49, 0.602, 0.574, 0) 
-rendimiento_rlm <- c(0.550, 0.13, 0.36, 0.57, 0.40, 0.62, 0.55, 0.45, 0.43, 0.53, 0.37, 0.37, 0.57, 0.47, 0.68, 0.31, 0.65, 0.37,0.57, 0.53, -0.01)
+# rendimiento_real <- c(0.519, 0, 0.456, 0.501, 0.456, 0.669, 0.522, 0.465, 0.465, 0.56, 0.391, 0.29, 0.57, 0.475, 0.63, 0.312, 0.615, 0.49, 0.602, 0.574, 0) 
+# rendimiento_rlm <- c(0.550, 0.13, 0.36, 0.57, 0.40, 0.62, 0.55, 0.45, 0.43, 0.53, 0.37, 0.37, 0.57, 0.47, 0.68, 0.31, 0.65, 0.37,0.57, 0.53, -0.01)
+
+datos_v <- read.csv("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos2.csv")
+
+rendimiento_real<- datos_v$Peso_kg
+rendimiento_rlm<- datos_v$Pronostico_kg
 
 # Crear el Diagrama de Taylor
 taylor.diagram(ref = rendimiento_real,
@@ -540,19 +565,19 @@ taylor.diagram(ref = rendimiento_real,
 
 **Estructura del diagrama y puntos clave**
 
-* El punto de referencia (Círculo negro vacío): Se ubica sobre el eje inferior. Representa las mediciones reales de rendimiento obtenidas en los 21 sitios de muestreo de la unidad de producion Dugarte. Su posición estática indica una correlación perfecta (1.0) consigo mismo y marca la desviación estándar de los datos observados en aproximadamente 0.175.
+* El punto de referencia (Círculo negro vacío): Se ubica sobre el eje inferior. Representa el comportamiento de las mediciones reales de rendimiento obtenidas en los 21 sitios de muestreo de la unidad de producion Dugarte. Su posición estática indica una correlación perfecta (1.0) consigo mismo y marca la desviación estándar (variabilidad natural) de los datos observados en aproximadamente 0.175.
 
 * El punto del modelo (Círculo rojo sólido): Representa el conjunto de predicciones generadas por la ecuación RLM + el kriging de los residuos que se construyo apoyandose en el NDVI y el Modelo Digital de Superficie (MDS). La calidad del modelo se define por qué tan cerca logra posicionarse este punto rojo respecto al círculo negro vacío.
 
 **Interpretación de las métricas para el Modelo RLM + Kriging (Punto rojo)**
 
-* Correlación de Pearson (Arco exterior): Al trazar una línea imaginaria desde el origen (0.00) que pase a través del punto rojo hasta llegar al arco graduado superior, se registra un valor aproximado de 0.82. Esto indica una correlación positiva fuerte. Significa que el modelo logra identificar y replicar con gran fidelidad la distribución espacial del cultivo; es decir, acierta dónde están las zonas de mayor y menor rendimiento de maíz.
+* Correlación de Pearson (Arco exterior): Al trazar una línea imaginaria desde el origen (0.00) que pase a través del punto rojo hasta llegar al arco graduado superior, se registra un valor aproximado de 0.95. Esto indica una correlación positiva fuerte. Significa que el modelo logra identificar y replicar con gran fidelidad la distribución espacial del cultivo; es decir, acierta dónde están las zonas de mayor y menor rendimiento de maíz.
 
 * Desviación Estándar (Ejes horizontal y vertical): La distancia radial desde el origen hasta el punto rojo refleja la dispersión de las predicciones, ubicándose en un valor de 0.155. Al ser este valor levemente inferior a la variabilidad natural del campo (0.175), se infiere que el modelo tiene un comportamiento ligeramente suavizado o conservador, subestimando muy levemente los picos más extremos de alto y bajo rendimiento en el lote.
 
-* Error Cuadrático Medio Centrado (RMSE): Los arcos grises curvos que se expanden desde el círculo negro miden la magnitud del error. El punto rojo aterriza con precisión matemática sobre la línea de contorno etiquetada con el valor 0.1. Esto cuantifica que el error predictivo promedio de la ecuación es bajo y se mantiene muy acotado frente a la variabilidad total del terreno.
+* Error Cuadrático Medio Centrado (RMSE): Los arcos grises curvos que se expanden desde el círculo negro miden la magnitud del error (alejandose del punto de referencia). El punto rojo aterriza a la mitad del camino entre el circulo de observaciones reales y el primer contorno etiquetado 0.1. Esto cuantifica que la diferencia promedio entre lo predice y la realidad es minima (ronda los 0.05).
 
-> **El modelo de regresión lineal múltiple presenta un desempeño estadístico robusto. La combinación de una alta capacidad para replicar patrones (correlación de 0.82) y un bajo nivel de incertidumbre (error de 0.1) valida exitosamente el uso de tus covariables espaciales para mapear y predecir el comportamiento del cultivo en esta superficie.**
+> **El modelo de regresión lineal múltiple presenta un desempeño estadístico robusto. La combinación de una alta capacidad para replicar patrones (correlación de 0.95) y un bajo nivel de incertidumbre (error de 0.1) valida exitosamente el uso de tus covariables espaciales para mapear y predecir el comportamiento del cultivo en esta superficie.**
 
 ---
 
@@ -684,4 +709,4 @@ El siguiente cuadro muestra un resumen de los cálculos realizados durante la de
 | Espaciamiento (m)  | 0,612     |
 |  Hileras trazadas  | 196       |
 |  Metros lineales   | 3090,5    |
-|  Kg de maiz total  | 1774      |
+|  Kg de maiz total area ensayo  | 1774      |
