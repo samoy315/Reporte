@@ -432,13 +432,13 @@ text(sitios,
 
 El ajuste del modelo de regresión lineal múltiple (RLM) se realizó tomando el rendimiento medido en campo (kg/m) como variable dependiente. Esta variable se correlacionó con los valores extraídos de dos covariables espaciales: el Modelo Digital de Superficie (MDS) y el índice NDVI. El análisis estadístico permitió definir los parámetros estructurales de la ecuación predictiva —el intercepto y los coeficientes de regresión—, la cual se detalla a continuación:
 
-$$Rendimiento = -1.477132 + 0.709441 \cdot NDVI + 0.007152 \cdot DSM$$
+<center>$$Rendimiento = -1.477132 + 0.709441 \cdot NDVI + 0.007152 \cdot DSM$$</center>
 
 ##### Genaracion del mapa de tendencia base del rendimiento (kg/m)
 
 Para generar el mapa de tendencia base de rendimiento (kg/m), se aplicó la ecuación de regresión lineal múltiple sobre cada píxel de las covariables espaciales: el Modelo Digital de Superficie (MDS) y el índice NDVI. Este procedimiento permitió obtener un Modelo Digital de Rendimiento base, cuyo comportamiento espacial responde exclusivamente a la topografía y al vigor vegetativo del cultivo, tal como se ilustra en la figura siguiente.
 
-```{r, warning = FALSE, echo=FALSE }
+```{r, results= 'hide', warning = FALSE, echo=FALSE }
 dsm_recortado2<- resample(dsm_recortado1_plot, ndvi_plot, method="bilinear")
 #writeRaster(dsm_recortado2, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/dsm_recortado2_plot.tif", overwrite = TRUE )
 
@@ -483,13 +483,13 @@ plot(residuos, main="Modelo digital de residuos", col=color_fijos4, cex.main=0.8
 
 Finalmente, se obtiene la capa de rendimientos (kg/m) corregida por los residuos, sumando la capa «Estimación de tendencia base de los rendimientos» a la capa ráster de residuos resultante del kriging ordinario (véase la figura siguiente).
 
-```{r, warning = FALSE, echo=FALSE }
-#residuos1<- resample(residuos, rendimiento_plot, metho="bilinear")
+```{r, warning = FALSE, echo=FALSE, results='hide'}
+residuos1<- resample(residuos, rendimiento_plot, metho="bilinear")
 rendimiento_final<- (rendimiento_plot - residuos1)
 #writeRaster(residuos1, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos1.tif")
 #writeRaster(rendimiento_final, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_final.tif", overwrite=TRUE)
-residuos1<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos1.tif")
-rendimiento_final<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_final.tif")
+#residuos1<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos1.tif")
+#rendimiento_final<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_final.tif")
 
 par(mfrow=c(1,1))
 caja <- ext(unidad)
