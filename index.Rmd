@@ -434,7 +434,7 @@ text(sitios,
 
 El ajuste del modelo de regresión lineal múltiple (RLM) se realizó tomando el rendimiento medido en campo (kg/m) como variable dependiente. Esta variable se correlacionó con los valores extraídos de dos covariables espaciales: el Modelo Digital de Superficie (MDS) y el índice NDVI. El análisis estadístico permitió definir los parámetros estructurales de la ecuación predictiva —el intercepto y los coeficientes de regresión—, la cual se detalla a continuación:
 
-**<center>Rendimiento = -1.477132 + (0.709441 \* NDVI) + (0.007152 \* DSM)</center>**
+<center><strong>Rendimiento = -1.477132 + (0.709441 \* NDVI) + (0.007152 \* DSM)</strong></center>
 
 ##### Genaracion del mapa de tendencia base del rendimiento (kg/m)
 
@@ -517,7 +517,7 @@ text(sitios,
 Se emplea el grafico de Taylor como una herramienta visual para evaluar matematicamente el desempeño del modelo predictivo de regresion-kriging (RLM). para lo que se toma tres estadísticas clave simultáneamente en un espacio bidimensional: el coeficiente de correlación, la desviación estándar y el error cuadrático medio centrado.
 
 
-```{r, fig.width=7, fig.height=7, warning = FALSE, echo=FALSE}
+```{r, fig.width=7, fig.height=7, warning = FALSE, echo=FALSE, message=FALSE}
 library(plotrix)
 
 # Datos de ejemplo (sustituye esto por tus variables reales)
