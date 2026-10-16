@@ -1,0 +1,11 @@
+setwd("C:/Sevilla/Diego170825/Rendimientos_maiz")
+library(terra); library(ggplot2)
+orto_uw_lote4<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/orto_uw_loto4.tif")
+par(mar=c(2,2,2,2))
+par(mfrow=c(1,1))
+plotRGB(orto_uw_lote4, 
+        r = 1, g = 2, b = 3, 
+        stretch = "lin",     # Estiramiento lineal para mejorar el contraste
+        axes = TRUE,         # Muestra las coordenadas cartográficas
+        main = "Ortomosaico - Color Verdadero")
+

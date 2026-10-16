@@ -1,9 +1,47 @@
 ---
 title: 'Muestreos de Suelos para Maíz en Portuguesa'
-author: 'Diego Machado, Jose Caicedo y Victor Sevilla'
-output: prettydoc::html_pretty
-date: "2026-08-10"
+author: 'Diego Machado, Jose Caicedo, Grabiel Machado y Victor Sevilla'
+date: "2026-10-10"
+output: 
+  rmdformats::readthedown:
+    toc_depth: 3
 ---
+
+<style>
+/* 1. Títulos del texto principal (Área de lectura) */
+h1, h2, h3, h4, h5, h6, .title { 
+  color: #2E7D32 !important; 
+}
+
+/* 2. Fondo de la caja superior izquierda */
+#sidebar h2 { 
+  background-color: #2E7D32 !important; 
+}
+
+/* 3. LA SOLUCIÓN: Fuerza el texto del título a blanco puro */
+#sidebar h2 a { 
+  color: #FFFFFF !important; 
+}
+
+/* 4. Textos inactivos del menú lateral (Gris claro para contraste) */
+#sidebar ul li a { 
+  color: #E0E0E0 !important; 
+}
+
+/* 5. Pestaña activa del menú (Fondo blanco, letra verde) */
+#sidebar .nav > .active > a, 
+#sidebar .nav > .active:hover > a, 
+#sidebar .nav > .active:focus > a {
+  color: #2E7D32 !important;
+  background-color: #FFFFFF !important;
+  border-left: 3px solid #2E7D32 !important;
+}
+
+/* 6. Botón de menú en teléfonos móviles */
+.navbar-toggle .icon-bar { 
+  background-color: #2E7D32 !important; 
+}
+</style>
 
 # Localización de sitios de muestreo
 
@@ -12,6 +50,7 @@ A continuación, se exponen diferentes métodos para localizar veinte (20) sitio
 ```{r, echo=FALSE, include=FALSE}
 library(sp); library(sf); library(raster); library(terra); library(leaflet); library(tidyverse); library(rmarkdown); library(sgsR); library(clhs); library(ggplot2); library(mapview)
 paleta_semaforo <- colorRampPalette(c("red", "orange", "yellow", "green3"))
+color_fijos4<- c("green3", "yellow", "orange", "red")
 ```
 
 ### Área de estudio
@@ -237,3 +276,367 @@ head(crds(s_dentro[subset.idx,]),20)
 # puntos_sf <- st_as_sf(puntos_clhs)
 # st_write(puntos_sf, dsn = "puntos_muestreo_clhs.shp", delete_layer = TRUE)
 ```
+
+------------------------------------------------------------------------
+
+# Estimación del Rendimiento del maíz en lotes Dugarte - Araure, empleando técnicas de GeoIA
+
+### Objetivos
+
+1.  Estimar geoespacialmente el rendimiento agrícola (kg/ha) del maíz sembrado en lotes de la unidad de producción Dugarte del estado Portuguesa, empleando un modelo híbrido de **Regresión-Kriging** Múltiple con variables auxiliares Topo-Espectrales.
+
+2.  Establecer las hileras de cultivos en un pequeño bloque de maíz del lote Dugarte 1, como base para calcular su longitud total y el rendimiento del maíz (kg/a) mediante técnicas de **Agrupamiento Espacial Anisotrópico y Regresión Lineal**.
+
+---
+
+### **1. Estimación de rendimientos del maiz con Regresión-kriging**
+
+#### Descripción del metodo empleado
+
+Para la predicción geoespacial de rendimiento agrícola (kg/ha) se empleó un modelo híbrido de Regresión-Kriging Múltiple con variables auxiliares como la fisiografía (modelo digital de superficie) y espectrales (bandas multiespectrales del sensor remoto a bordo de dron).
+
+La Regresión-Kriging (RK) es una técnica de interpolación espacial híbrida que asume que la variación de una propiedad (en este caso, el rendimiento del maíz) no es totalmente aleatoria, sino que puede dividirse en dos componentes fundamentales: una tendencia determinística y un error espacialmente correlacionado (estocástico). La teoría se fundamenta en combinar las fortalezas de dos disciplinas:
+
+-   *Estadística Clásica (Regresión Múltiple)*, la cual explica el porqué de la variación del rendimiento a gran escala. Utiliza variables físicas-naturales (auxiliares) que afectan lógicamente a la planta o que expresan sus cambios.
+
+    -   Modelo digital de superficie (Elevación Variable Topográfica): Determina la escorrentía, la acumulación de agua y la profundidad efectiva del suelo, variables críticas que condicionan el rendimiento final.
+
+    -   NDVI (Variable Espectral): Actúa como un indicador indirecto de la biomasa fotosintéticamente activa y la salud del dosel.
+
+-   Geoestadística (Kriging Ordinario): Explica la variación a escala fina que las variables auxiliares anteriormente mencionadas no lograron capturar. Se basa en el Principio de Tobler: "las cosas que están más cerca se parecen más que las cosas distantes". Interpolando matemáticamente los "errores" de la regresión, se corrige la predicción final.
+
+#### Procedimientos
+
+El flujo de trabajo para lograr este mapa de rendimiento consta de 7 pasos:
+
+##### Paso 1: Preparación Espacial y Extracción
+
+Se cargan los puntos vectoriales de rendimiento medido en campo (kg/m) y las capas raster auxiliares (Modelo digital de superficie y el NDVI). Ambos de tipo rasters deben estar apilados espacialmente. Mediante álgebra espacial, se extraen los valores exactos de Altura y NDVI que caen justo debajo de cada punto de muestreo.
+
+##### Paso 2: Ajuste del Modelo de Regresión
+
+Se entrena el modelo de regresión lineal múltiple utilizando la tabla de datos creada en el Paso 1. Se evalúa el grado de significancia estadística de ambas variables auxiliares (valor-p) para asegurar que el NDVI y la elevación aportan información útil al modelo predictivo.
+
+##### Paso 3: Generación del Mapa de Tendencia
+
+Se aplica la ecuación de regresión obtenida sobre la totalidad de los píxeles de los rasters de NDVI y Altura. El resultado es un mapa base de rendimiento (kg/m) que responde puramente a la topografía y el vigor, pero ignora la autocorrelación geográfica.
+
+##### Paso 4: Cálculo de los Residuos
+
+Se resta el valor de rendimiento predicho por la regresión al valor de rendimiento real medido en el campo. Se genera una nueva capa vectorial de puntos que contiene únicamente estos "errores" de predicción (residuos).
+
+##### Paso 5: Modelado del Semivariograma de los Residuos
+
+Se construye el semivariograma empírico de los residuos y se le ajusta un modelo matemático teórico. Esto permite entender hasta qué distancia en metros el error de una zona del campo afecta a sus zonas vecinas.
+
+##### Paso 6: Kriging Ordinario de los Residuos
+
+Utilizando el semivariograma ajustado, se ejecuta un Kriging Ordinario únicamente sobre los residuos. Esto produce un mapa continuo que representa cómo se distribuye espacialmente el error de la regresión en todo el lote.
+
+##### Paso 7: Integración Geomática y Mapa Final
+
+Se emplea álgebra de mapas para sumar algebraicamente el "Mapa de Tendencia" (Paso 3) y el "Mapa de Residuos Interpolados" (Paso 6). Las zonas donde la regresión subestimó el rendimiento se corrigen al alza, y donde sobreestimó se corrigen a la baja, produciendo el mapa definitivo de alta precisión.
+
+#### Resultados
+
+##### Preparación Espacial y Extracción
+
+Como resultado del procesamiento fotogramétrico, se generó un ortomosaico multiespectral conformado por ocho (8) bandas. La visualización de cada una de ellas se presenta a continuación:
+
+```{r, warning = FALSE, echo=FALSE}
+#Capas necesarias para todo el procedimientgo:
+orto<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/Orto_10cm_apilado_uw1.tif")
+unidad<- vect("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/Camburito_Acarigua1.shp") 
+bloquecito<- vect("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/bloquecito1.shp")
+sitios<- vect("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/PMRend4.shp")
+perimetro<- vect("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/perimetro_uw.shp")
+dsm<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/DSM_apilado_uw.tif")
+bloquecito<- vect("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/bloquecito1.shp")
+orto_bloquecito<- crop(orto, bloquecito)
+orto_bloquecito1<- mask(orto_bloquecito, bloquecito)
+
+#plot(dsm)
+#Recortar el orto:
+#raster_recortado<- crop(orto, perimetro)
+#orto_recortado<- mask(raster_recortado, perimetro)
+#names(orto_recortado)<- c("Red", "Verde", "Azul", "Verde_multiespetral", "Rojo_multiespectral", "RedEdge", "NIR", "Alpha")
+#dsm_recortado<- crop(dsm, perimetro)
+#dsm_recortado1<- mask(dsm_recortado, perimetro)
+#plot(dsm_recortado1)
+
+#dsm_recortado1<- mask(dsm_recortado, perimetro)
+
+#writeRaster(orto_recortado, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/orto_recortado_plot.tif")
+#writeRaster(dsm_recortado1, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/dsm_recortado1_plot.tif")
+
+#Plotear orto:
+orto_recortado_plot<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/orto_recortado_plot.tif")
+plot(orto_recortado_plot)
+mtext("Bandas del ortofotomosaico", side = 1, line = 0.1, cex = 1, col = "gray40")
+```
+
+Entre los productos espaciales generados destaca el **Modelo Digital de Superficie (MDS)**, el cual representa de forma continua la elevación topográfica del área de estudio. De manera complementaria, se calculó el **Índice de Vegetación de Diferencia Normalizada (NDVI)** a partir de la reflectancia de las bandas del infrarrojo cercano (NIR) y rojo (R). Ambas capas ráster se visualizan en la figura siguiente.
+
+```{r, warning = FALSE, echo=FALSE}
+#ndvi<- ((orto_recortado$NIR - orto_recortado$Rojo_multiespectral ) / (orto_recortado$NIR + orto_recortado$Rojo_multiespectral))
+
+#writeRaster(ndvi, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/ndvi_plot.tif")
+
+#ploteamos el NDVI y el mds:
+paleta_vegetacion <- colorRampPalette(c("darkred", "yellow", "darkgreen"))(100)
+color_fijos2<- c("darkblue", "dodgerblue", "green3", "gold", "red", "darkred")
+color_fijos1<- c("darkred", "red", "gold", "green3", "dodgerblue", "darkblue")
+par(mfrow=c(1,2))
+ndvi_plot<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/ndvi_plot.tif")
+dsm_recortado1_plot<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/dsm_recortado1_plot.tif")
+plot(ndvi_plot, main="NDVI", col=paleta_vegetacion)
+plot(dsm_recortado1_plot, main="Modelo digital de superficie (msnm)", col=color_fijos1, cex.main=0.8)
+
+```
+
+De forma complementaria, se llevó a cabo una evaluación agronómica en campo para caracterizar el estado productivo del cultivo de maíz. Se establecieron 21 sitios de muestreo donde se cuantificaron variables biométricas como el número de plantas, la cantidad de mazorcas y, dentro de estas, el número de hileras y el total de granos. A partir de estos datos, se calculó un índice de rendimiento expresado en kilogramos de maíz por metro lineal para cada punto. La **distribución espacial de estos sitios** y los resultados obtenidos se presentan a continuación:
+
+```{r, warning = FALSE, echo=FALSE}
+# 1. RECUPERAMOS LOS CÁLCULOS GEOMÉTRICOS (¡Esto es lo que faltaba!)
+caja <- ext(unidad)
+ancho_x <- caja[2] - caja[1]
+nuevo_xmax <- caja[2] + (ancho_x * 0.35)
+
+# 2. LIENZO VACÍO: Dibuja la caja de coordenadas con el margen extra
+plot(NULL, type = "n", 
+     xlim = c(caja[1], nuevo_xmax), 
+     ylim = c(caja[3], caja[4]),
+     main = "Sitios de muestreo",
+     xlab = "Coordenadas X", ylab = "Coordenadas Y", 
+     asp = 1) 
+
+# 3. PEGAR EL RASTER: Usamos add = TRUE para que se acomode sin borrar el título
+composicion_color <- c(orto_recortado_plot$Red, orto_recortado_plot$Verde, orto_recortado_plot$Azul)
+names(composicion_color) <- c("Rojo", "Verde", "Blue")
+plotRGB(composicion_color, r = 1, g = 2, b = 3, stretch = "lin", add = TRUE)
+
+# 4. PEGAR VECTORES Y TEXTO
+plot(unidad, add = TRUE, lwd = 3, border = "black")
+plot(sitios, add = TRUE, col = "blue", pch = 16, cex = 1)
+
+text(sitios,
+     labels = sitios$Peso_kg,
+     pos = 4,
+     offset = 0.5,
+     col = "black",
+     cex = 0.6,
+     font = 2)
+```
+
+##### Ajuste del modelo de regresion
+
+El ajuste del modelo de regresión lineal múltiple (RLM) se realizó tomando el rendimiento medido en campo (kg/m) como variable dependiente. Esta variable se correlacionó con los valores extraídos de dos covariables espaciales: el Modelo Digital de Superficie (MDS) y el índice NDVI. El análisis estadístico permitió definir los parámetros estructurales de la ecuación predictiva —el intercepto y los coeficientes de regresión—, la cual se detalla a continuación:
+
+$$Rendimiento = -1.477132 + 0.709441 \cdot NDVI + 0.007152 \cdot DSM$$
+
+##### Genaracion del mapa de tendencia base del rendimiento (kg/m)
+
+Para generar el mapa de tendencia base de rendimiento (kg/m), se aplicó la ecuación de regresión lineal múltiple sobre cada píxel de las covariables espaciales: el Modelo Digital de Superficie (MDS) y el índice NDVI. Este procedimiento permitió obtener un Modelo Digital de Rendimiento base, cuyo comportamiento espacial responde exclusivamente a la topografía y al vigor vegetativo del cultivo, tal como se ilustra en la figura siguiente.
+
+```{r, warning = FALSE, echo=FALSE }
+dsm_recortado2<- resample(dsm_recortado1_plot, ndvi_plot, method="bilinear")
+#writeRaster(dsm_recortado2, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/dsm_recortado2_plot.tif", overwrite = TRUE )
+
+#dsm_recortado2_plot<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/dsm_recortado2_plot.tif")
+
+rendimiento<- (( ndvi_plot * 0.709441 ) + ( dsm_recortado2 * 0.007152 ) - (1.4771320))
+#writeRaster(rendimiento, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_plot.tif", overwrite = TRUE )
+rendimiento_plot<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_plot.tif")
+
+color_fijos3<- c("red", "orange", "yellow", "green3")
+ 
+par(mfrow=c(1,1))
+caja <- ext(unidad)
+ancho_x <- caja[2] - caja[1]
+nuevo_xmax <- caja[2] + (ancho_x * 0.35)
+plot(rendimiento_plot, main="Mapa de tendencia base de rendimientos de maiz (Kg/m)", 
+      col=color_fijos3,
+      xlim = c(caja[1], nuevo_xmax), cex.main=0.9) # <-- ¡El truco se aplica aquí!)
+plot(unidad, add=TRUE, lwd=1, border = "black")
+plot(sitios, add = TRUE, col = "blue", pch = 16, cex = 1)
+text(sitios,
+  labels = sitios$Peso_kg, # SUSTITUYE 'NAME_2' por tu columna, ej: sitios$Nombre
+  pos = 4,                      # pos = 4 indica que el texto va a la derecha
+  offset = 0.5,                 # Separación entre el punto azul y el inicio del texto
+  col = "black",
+  cex = 0.6,                    # Tamaño de la letra
+  font = 2)                     # font = 2 coloca el texto en negrita (opcional)
+```
+
+##### Calculo de los residuos
+
+En este paso, se restan los valores de rendimiento predichos por la ecuación de regresión múltiple a los valores de rendimiento real medidos en campo en cada sitio preciso, obteniendo así los residuos para cada punto, los cuales se interpolan a toda la superficie de la unidad mediante kriging ordinario. El cuadro siguiente muestra las diferencias o residuos y, en la figura correspondiente, su distribución espacial.
+
+![](residuos2.jpeg)
+
+```{r, warning = FALSE, echo=FALSE}
+residuos<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/Error2.tif")
+plot(residuos, main="Modelo digital de residuos", col=color_fijos4, cex.main=0.8)
+```
+
+##### Integracion Geoamatica y mapa final.
+
+Finalmente, se obtiene la capa de rendimientos (kg/m) corregida por los residuos, sumando la capa «Estimación de tendencia base de los rendimientos» a la capa ráster de residuos resultante del kriging ordinario (véase la figura siguiente).
+
+```{r, warning = FALSE, echo=FALSE }
+#residuos1<- resample(residuos, rendimiento_plot, metho="bilinear")
+rendimiento_final<- (rendimiento_plot - residuos1)
+#writeRaster(residuos1, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos1.tif")
+#writeRaster(rendimiento_final, "C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_final.tif", overwrite=TRUE)
+residuos1<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/residuos1.tif")
+rendimiento_final<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/rendimiento_final.tif")
+
+par(mfrow=c(1,1))
+caja <- ext(unidad)
+ancho_x <- caja[2] - caja[1]
+nuevo_xmax <- caja[2] + (ancho_x * 0.35)
+plot(rendimiento_final, main="Mapa final de rendimientos de maiz (Kg/m)", 
+      col=color_fijos3,
+      xlim = c(caja[1], nuevo_xmax), cex.main=0.9) # <-- ¡El truco se aplica aquí!)
+plot(unidad, add=TRUE, lwd=1, border = "black")
+plot(sitios, add = TRUE, col = "blue", pch = 16, cex = 1)
+text(sitios,
+  labels = sitios$Peso_kg, # SUSTITUYE 'NAME_2' por tu columna, ej: sitios$Nombre
+  pos = 4,                      # pos = 4 indica que el texto va a la derecha
+  offset = 0.5,                 # Separación entre el punto azul y el inicio del texto
+  col = "black",
+  cex = 0.55,                    # Tamaño de la letra
+  font = 2)                     # font = 2 coloca el texto en negrita (opcional)
+```
+
+------------------------------------------------------------------------
+
+### **2. Establecimiento de hileras de cultivo (Maíz) mediante técnicas de agrupamiento espacial anisotrópico y regresión lineal.**
+
+#### Descripción del metodo empleado
+
+La vectorización geométrica de hileras de cultivo mediante Clustering Espacial Anisotrópico y Regresión Lineal fusiona conceptos de teledetección, estadística espacial y geometría analítica para resolver un problema de visión por computadora sin depender de algoritmos tradicionales de detección de bordes (como la Transformada de Hough), los cuales suelen fallar ante el ruido y las irregularidades del terreno.
+
+**La metodología se sustenta en tres pilares teóricos:**
+
+a.  *Segmentación Espectral (Teledetección)*: Aprovecha la firma espectral de las plantas. Utilizando índices de vegetación (como NDVI o ExG), se maximiza el contraste entre la biomasa fotosintéticamente activa y el suelo desnudo, permitiendo una binarización determinística (verdadero/falso). b
+
+b.  *Agrupamiento Espacial Basado en Densidad (DBSCAN)*: Se basa en el algoritmo Density-Based Spatial Clustering of Applications with Noise. DBSCAN agrupa puntos que están cercanamente empaquetados y marca como "ruido" aquellos puntos aislados en regiones de baja densidad. La innovación aquí es la aplicación de Anisotropía (alteración intencional de la escala en un eje) para obligar al algoritmo a agrupar los puntos direccionalmente a lo largo del surco, evitando que salte a hileras adyacentes.
+
+c.  *Modelado Geométrico (Mínimos Cuadrados Ordinarios)*: En lugar de unir los puntos como un zig-zag, se asume el principio agronómico de que la maquinaria agrícola traza líneas rectas. Se aplica una regresión lineal simple a la nube de puntos de cada hilera para encontrar la recta que minimiza la suma de los errores cuadráticos, obteniendo una línea central perfecta.
+
+#### Procedimientos
+
+El flujo de trabajo para lograr este objetivo consta de 6 pasos:
+
+##### Paso 1: Binarización del Ortomosaico
+
+A partir de un ortomosaico multiespectral o RGB de alta resolución (centimétrica), se calcula un índice de vegetación. Se aplica un umbral empírico para reclasificar la imagen en valores nulos (NA) para el suelo/sombras y valor 1 para las plantas.
+
+##### Paso 2: Generación de la Nube de Puntos
+
+Se extraen espacialmente los píxeles clasificados como planta y se convierten en una matriz de puntos con coordenadas geográficas reales (X, Y). Esto reduce drásticamente el peso computacional, pasando de procesar millones de píxeles a evaluar solo las coordenadas relevantes.
+
+##### Paso 3: Clustering Anisotrópico (Agrupamiento Direccional)
+
+Se altera matemáticamente la escala de un eje (por ejemplo, multiplicando la coordenada X por 5) para separar virtualmente los surcos. Luego, se aplica el algoritmo DBSCAN definiendo un radio de búsqueda (EPS) y una cantidad mínima de puntos (minPts). Esto asigna un identificador (ID) único a cada hilera real y clasifica la maleza aislada como ruido.
+
+##### Paso 4: Trazado Geométrico de Hileras
+
+Iterando sobre cada ID de hilera válido, se toman todos sus puntos y se introducen en un modelo de regresión lineal. Se proyectan las coordenadas máximas y mínimas sobre la recta resultante para construir un segmento de línea vectorial continua (Shapefile) que representa el eje central del surco.
+
+##### Paso 5: Confinamiento Espacial
+
+Dado que las líneas de regresión calculadas pueden proyectarse infinitamente, se debe delimitar su inicio y fin. Se genera un polígono envolvente estricto (Convex Hull) alrededor de la nube de puntos general, o se utiliza el polígono del bloque de cultivo del maíz en el lote 4 (ensayo). Se realiza una intersección geométrica para cortar las líneas exactamente donde terminan las plantas.
+
+##### Paso 6: Cuantificación Final
+
+Con la red de líneas vectoriales limpia y confinada, se utiliza un motor de geometría espacial para calcular la longitud de cada línea individual en metros. Finalmente, se suman todas las longitudes para entregar la distancia total sembrada del lote. La cual es multiplicada por el dato de kg/ml (obtenido en campo) del punto más cercano al bloque estudiado y de esta manera obtener los kilogramos estimados para este ensayo.
+
+#### Resultados
+
+##### Area de ensayo
+
+El área de ensayo seleccionada para aplicar esta metodología se ubica en el lote Dugarte 4, situado en el extremo sur de la unidad de estudio. Este polígono abarca una superficie de 0,21 ha, dentro de la cual se trazaron las hileras del cultivo de maíz con el objetivo de cuantificar su longitud lineal total.
+
+```{r, warning = FALSE, echo=FALSE}
+caja <- ext(bloquecito)
+ancho_x <- caja[2] - caja[1]
+nuevo_xmax <- caja[2] + (ancho_x * 0.1)
+
+# 2. LIENZO VACÍO: Dibuja la caja de coordenadas con el margen extra
+plot(NULL, type = "n", 
+     xlim = c(caja[1], nuevo_xmax), 
+     ylim = c(caja[3], caja[4]),
+     main = "Area de ensayo para trazar hileras de cutivos",
+     xlab = "Coordenadas X", ylab = "Coordenadas Y", 
+     asp = 1) 
+
+# 3. PEGAR EL RASTER: Usamos add = TRUE para que se acomode sin borrar el título
+composicion_color_bloquecito <- c(orto_bloquecito1$Orto_10cm_apilado_uw1_1, orto_bloquecito1$Orto_10cm_apilado_uw1_2, orto_bloquecito1$Orto_10cm_apilado_uw1_3)
+names(composicion_color_bloquecito) <- c("Rojo", "Verde", "Azul")
+plotRGB(composicion_color_bloquecito, r = 1, g = 2, b = 3, stretch = "lin", add = TRUE)
+plot(bloquecito, add=TRUE, border="black", lwd=3)
+```
+
+##### Binarizacion del ortofotomosaico
+
+A partir del ortofotomosaico multiespectral de alta resolución centimétrica, se calculó el índice de vegetación y se aplicó un umbral empírico para reclasificar la imagen, asignando valores nulos (NA) al suelo/sombras y el valor 1 a la vegetación. Esto dio como resultado la binarización que se muestra en la siguiente figura.
+
+```{r, warning = FALSE, echo=FALSE}
+mascara_exg<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/mascara_exg.tif")
+colores_fijos <- c("red", "gold", "green3", "dodgerblue")
+# 1. DIBUJAMOS EL MAPA: Metemos el margen (mar) y los ejes (axes) directamente aquí
+plot(mascara_exg, col = "red", main = "Capa de binarizacion", 
+     legend = FALSE, axes = TRUE, 
+     mar = c(4, 4, 3, 10)) # El 10 garantiza un margen blanco gigante a la derecha
+plot(bloquecito, add=TRUE, border="black", lwd=2)
+
+# 2. DIBUJAMOS LA LEYENDA: 
+# Usamos "topright" + un inset negativo para empujarla al blanco
+# Añadimos xpd = NA aquí mismo para darle permiso de salir del mapa
+legend("topright", inset = c(-0.35, 0), xpd = NA,
+       legend = c("Cultivo maiz"), 
+       fill = colores_fijos, 
+       title = "Clases", 
+       bg = "white", box.col = "gray80", cex = 0.9)
+#plot(mascara_exg, col="red", main="Capa de binarizacion", legend=FALSE )
+#legend(x = 470390, y = 1059840,legend = c("Muy alto","Alto","Moderado","Bajo"),fill = #colores_fijos,title = "Grado de Impacto", bg = "white",box.col = "gray80",cex = 0.9,
+#       xjust = 0,                         # Alineación de la caja respecto al punto x
+#       yjust = 0)                         # Alineación de la caja respecto al punto y
+```
+
+##### Trazado de lineas sobre el Indice NDVI
+
+El procedimiento continúa con el trazado de las hileras del cultivo de maíz, tanto sobre el índice NDVI como sobre la capa de binarización. Además, indica cuántas hileras resultaron del análisis y la suma de sus metros lineales. Lo que se puede observar en las figuras siguiente.
+
+```{r, warning = FALSE, echo=FALSE}
+indice<- rast("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/hileras_indice.tif")
+hileras_sf<- st_read("C:/Sevilla/Diego170825/Rendimientos_maiz/Metodo_diego/hileras_sf.shp", quiet=TRUE)
+
+plot(indice, main = "NDVI con hileras", col = paleta_vegetacion)
+plot(st_geometry(hileras_sf), add = TRUE, col = "blue", lwd = 1.6)
+
+
+plot(mascara_exg, col = "red", legend = FALSE,
+     main = paste("Hileras:", nrow(hileras_sf),"| Metros: 3095,5 m"))
+plot(st_geometry(hileras_sf), add = TRUE, col = "blue", lwd = 1)
+
+```
+
+##### Resumen de resultados
+
+El siguiente cuadro muestra un resumen de los cálculos realizados durante la detección y el trazado de las hileras del cultivo de maíz en esta pequeña área de ensayo.
+
+<center>Cuadro. Resumen.</center>
+
+|     Elementos      | Datos     |
+|:------------------:|:----------|
+|       Indice       | NDVI      |
+|       Umbral       | 0.3       |
+| Pixeles de plantas | 1.769.443 |
+| Angulo (radianes)  | 1,8785    |
+| Espaciamiento (m)  | 0,612     |
+|  Hileras trazadas  | 196       |
+|  Metros lineales   | 3090,5    |
+|  Kg de maiz total  | 1774      |
