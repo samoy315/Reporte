@@ -67,7 +67,7 @@ body {
 
 # Localización de sitios de muestreo
 
-A continuación, se exponen diferentes métodos para localizar veinte (20) sitios de observación en campo, para que posteriormente se logre la estimación de los rendimientos del cultivo de maíz en área bajo estudio.
+A continuación, se exponen diferentes métodos para localizar veinte (21) sitios de observación en campo, para que posteriormente se logre la estimación de los rendimientos del cultivo de maíz en área bajo estudio.
 
 ```{r, echo=FALSE, include=FALSE}
 library(sp); library(sf); library(raster); library(terra); library(leaflet); library(tidyverse); library(rmarkdown); library(sgsR); library(clhs); library(ggplot2); library(mapview)
@@ -301,7 +301,7 @@ head(crds(s_dentro[subset.idx,]),20)
 
 ------------------------------------------------------------------------
 
-# Estimación del Rendimiento del maíz empleando técnicas GeoIA
+# Estimación Rendimiento del maíz con técnicas GeoIA
 
 ### Objetivos
 
@@ -363,7 +363,7 @@ Se emplea álgebra de mapas para sumar algebraicamente el "Mapa de Tendencia" (P
 
 ##### Preparación Espacial y Extracción
 
-Como resultado del procesamiento fotogramétrico, se generó un ortomosaico multiespectral conformado por ocho (8) bandas. La visualización de cada una de ellas se presenta a continuación:
+Como resultado del procesamiento fotogramétrico, se generó un ortomosaico multiespectral conformado por siete (7) bandas. La visualización de cada una de ellas se presenta a continuación:
 
 ```{r, warning = FALSE, echo=FALSE}
 #Capas necesarias para todo el procedimientgo:
